@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+option java_package = "ex.grpc";
+
+package wifs;
+
+service WIFS {
+  rpc wifs_READ(ReadReq) returns (ReadRes){}
+  rpc wifs_WRITE(WriteReq) returns (WriteRes){}
+}
+
+message WriteReq {
+  int32 address = 1;
+  bytes buf = 2;
+
+  enum Crash {
+    NO_CRASH = 0;
+
+    PRIMARY_CRASH_BEFORE_LOCAL_WRITE_AFTER_REMOTE = 1;
+
+    PRIMARY_CRASH_AFTER_LOCAL_WRITE_AFTER_REMOTE = 2;
+
+    PRIMARY_CRASH_BEFORE_LOCAL_WRITE_BEFORE_REMOTE = 3;
+
+    PRIMARY_CRASH_AFTER_LOCAL_WRITE_BEFORE_REMOTE = 4;
+
+    BACKUP_CRASH_BEFORE_WRITE = 5;
+
+    BACKUP_CRASH_AFTER_WRITE = 6;
+
+    NODE_CRASH_READ = 7;
+  }
+  Crash crash_mode = 3;
+}
+
+message WriteRes {
+  enum Status {
+    FAIL = 0;
+
+    PASS = 1;
+
+    // retry with the given server address
+    RETRY = 2;
+    
+    //current server running alone with no backup
+    SOLO = 3;
+  }
+  Status status = 1;
+  
+  bytes buf = 2;
+
+  bytes node_ip = 3;
+
+  bytes primary_ip = 4;
+}
+
+message ReadReq {
+  int32 address = 1;
+  bytes buf = 2;
+
+  enum Crash {
+    NO_CRASH = 0;
+
+    PRIMARY_CRASH_BEFORE_LOCAL_WRITE_AFTER_REMOTE = 1;
+
+    PRIMARY_CRASH_AFTER_LOCAL_WRITE_AFTER_REMOTE = 2;
+
+    PRIMARY_CRASH_BEFORE_LOCAL_WRITE_BEFORE_REMOTE = 3;
+
+    PRIMARY_CRASH_AFTER_LOCAL_WRITE_BEFORE_REMOTE = 4;
+
+    BACKUP_CRASH_BEFORE_WRITE = 5;
+
+    BACKUP_CRASH_AFTER_WRITE = 6;
+
+    NODE_CRASH_READ = 7;
+  }
+  Crash crash_mode = 3;
+}
+
+message ReadRes {
+    enum Status {
+    FAIL = 0;
+
+    PASS = 1;
+
+    // retry with the given server address
+    RETRY = 2;
+
+    //current server running alone with no backup
+    SOLO = 3;
+  }
+  Status status = 1;
+
+  bytes buf = 2;
+
+  bytes node_ip = 3;
+
+  bytes primary_ip = 4;
+}
